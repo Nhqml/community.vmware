@@ -1,29 +1,24 @@
-.. _community.vmware.vmware_local_role_facts_module:
+.. _community.vmware.vmware_guest_tpm_module:
 
 
-****************************************
-community.vmware.vmware_local_role_facts
-****************************************
+*********************************
+community.vmware.vmware_guest_tpm
+*********************************
 
-**Gather facts about local roles on an ESXi host**
+**Add or remove vTPM device for specified VM.**
 
 
+Version added: 1.16.0
 
 .. contents::
    :local:
    :depth: 1
 
-DEPRECATED
-----------
-:Removed in collection release after 2021-12-01
-:Why: Deprecated in favour of :ref:`community.vmware.vmware_local_role_info <community.vmware.vmware_local_role_info_module>` module.
-:Alternative: Use :ref:`community.vmware.vmware_local_role_info <community.vmware.vmware_local_role_info_module>` instead.
-
-
 
 Synopsis
 --------
-- This module can be used to gather facts about local role facts on an ESXi host
+- This module is used for adding or removing Virtual Trusted Platform Module(vTPM) device for an existing Virtual Machine. You must create a key provider on vCenter before you can add a vTPM. The ESXi hosts running in your environment must be ESXi 6.7 or later (Windows guest OS), or 7.0 Update 2 (Linux guest OS).
+
 
 
 
@@ -49,6 +44,48 @@ Parameters
             <tr>
                 <td colspan="1">
                     <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>datacenter</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">string</span>
+                         / <span style="color: red">required</span>
+                    </div>
+                </td>
+                <td>
+                </td>
+                <td>
+                        <div>The vCenter datacenter name used to get specified cluster or host.</div>
+                        <div>This parameter is case sensitive.</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>folder</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">string</span>
+                    </div>
+                </td>
+                <td>
+                </td>
+                <td>
+                        <div>VM folder, absolute or relative path to find an existing VM.</div>
+                        <div>This parameter is not required, only when multiple VMs are found with the same name.</div>
+                        <div>The folder should include the datacenter name.</div>
+                        <div>Examples:</div>
+                        <div>folder: /datacenter1/vm</div>
+                        <div>folder: datacenter1/vm</div>
+                        <div>folder: /datacenter1/vm/folder1</div>
+                        <div>folder: datacenter1/vm/folder1</div>
+                        <div>folder: /folder1/datacenter1/vm</div>
+                        <div>folder: folder1/datacenter1/vm</div>
+                        <div>folder: /folder1/datacenter1/vm/folder2</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
                     <b>hostname</b>
                     <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
                     <div style="font-size: small">
@@ -61,6 +98,38 @@ Parameters
                         <div>The hostname or IP address of the vSphere vCenter or ESXi server.</div>
                         <div>If the value is not specified in the task, the value of environment variable <code>VMWARE_HOST</code> will be used instead.</div>
                         <div>Environment variable support added in Ansible 2.6.</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>moid</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">string</span>
+                    </div>
+                </td>
+                <td>
+                </td>
+                <td>
+                        <div>Managed Object ID of the instance to manage if known, this is a unique identifier only within a single vCenter instance.</div>
+                        <div>This is required if <code>name</code> or <code>uuid</code> is not supplied.</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>name</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">string</span>
+                    </div>
+                </td>
+                <td>
+                </td>
+                <td>
+                        <div>Name of the virtual machine.</div>
+                        <div>This is required if parameter <code>uuid</code> or <code>moid</code> is not supplied.</div>
                 </td>
             </tr>
             <tr>
@@ -136,6 +205,29 @@ Parameters
             <tr>
                 <td colspan="1">
                     <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>state</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">string</span>
+                    </div>
+                </td>
+                <td>
+                        <ul style="margin: 0; padding: 0"><b>Choices:</b>
+                                    <li><div style="color: blue"><b>present</b>&nbsp;&larr;</div></li>
+                                    <li>absent</li>
+                        </ul>
+                </td>
+                <td>
+                        <div>State of vTPM device.</div>
+                        <div>If set to &#x27;absent&#x27;, vTPM device will be removed from VM.</div>
+                        <div>If set to &#x27;present&#x27;, vTPM device will be added if not present.</div>
+                        <div>Virtual machine should be turned off before add or remove vTPM device.</div>
+                        <div>Virtual machine should not contain snapshots before add vTPM device.</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
                     <b>username</b>
                     <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
                     <div style="font-size: small">
@@ -149,6 +241,22 @@ Parameters
                         <div>If the value is not specified in the task, the value of environment variable <code>VMWARE_USER</code> will be used instead.</div>
                         <div>Environment variable support added in Ansible 2.6.</div>
                         <div style="font-size: small; color: darkgreen"><br/>aliases: admin, user</div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="1">
+                    <div class="ansibleOptionAnchor" id="parameter-"></div>
+                    <b>uuid</b>
+                    <a class="ansibleOptionLink" href="#parameter-" title="Permalink to this option"></a>
+                    <div style="font-size: small">
+                        <span style="color: purple">string</span>
+                    </div>
+                </td>
+                <td>
+                </td>
+                <td>
+                        <div>UUID of the instance to manage if known, this is VMware&#x27;s unique identifier.</div>
+                        <div>This is required if parameter <code>name</code> or <code>moid</code> is not supplied.</div>
                 </td>
             </tr>
             <tr>
@@ -181,9 +289,8 @@ Notes
 -----
 
 .. note::
-   - Tested on ESXi 6.5
-   - Be sure that the ESXi user used for login, has the appropriate rights to view roles
-   - The module returns a list of dict in version 2.8 and above.
+   - Tested on vSphere 6.7
+   - Tested on vSphere 7.0
    - All modules requires API write access and hence is not supported on a free ESXi license.
 
 
@@ -193,18 +300,25 @@ Examples
 
 .. code-block:: yaml
 
-    - name: Gather facts about local role from an ESXi
-      community.vmware.vmware_local_role_facts:
-        hostname: '{{ esxi_hostname }}'
-        username: '{{ esxi_username }}'
-        password: '{{ esxi_password }}'
-      register: fact_details
+    - name: Add vTPM to specified VM
+      community.vmware.vmware_guest_tpm:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter }}"
+        name: "Test_VM"
+        state: present
       delegate_to: localhost
-    - name: Get Admin privileges
-      set_fact:
-        admin_priv: "{{ fact_details.local_role_facts['Admin']['privileges'] }}"
-    - debug:
-        msg: "{{ admin_priv }}"
+
+    - name: Remove vTPM from specified VM
+      community.vmware.vmware_guest_tpm:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter }}"
+        name: "Test_VM"
+        state: absent
+      delegate_to: localhost
 
 
 
@@ -223,7 +337,7 @@ Common return values are documented `here <https://docs.ansible.com/ansible/late
             <tr>
                 <td colspan="1">
                     <div class="ansibleOptionAnchor" id="return-"></div>
-                    <b>local_role_facts</b>
+                    <b>instance</b>
                     <a class="ansibleOptionLink" href="#return-" title="Permalink to this return value"></a>
                     <div style="font-size: small">
                       <span style="color: purple">dictionary</span>
@@ -231,10 +345,10 @@ Common return values are documented `here <https://docs.ansible.com/ansible/late
                 </td>
                 <td>always</td>
                 <td>
-                            <div>Facts about role present on ESXi host</div>
+                            <div>metadata about the VM vTPM device</div>
                     <br/>
                         <div style="font-size: smaller"><b>Sample:</b></div>
-                        <div style="font-size: smaller; color: blue; word-wrap: break-word; word-break: break-all;">[{&#x27;privileges&#x27;: [&#x27;Alarm.Acknowledge&#x27;, &#x27;Alarm.Create&#x27;, &#x27;Alarm.Delete&#x27;, &#x27;Alarm.DisableActions&#x27;], &#x27;role_id&#x27;: -12, &#x27;role_info_label&#x27;: &#x27;Ansible User&#x27;, &#x27;role_info_summary&#x27;: &#x27;Ansible Automation user&#x27;, &#x27;role_name&#x27;: &#x27;AnsiUser1&#x27;, &#x27;role_system&#x27;: True}, {&#x27;privileges&#x27;: [], &#x27;role_id&#x27;: -5, &#x27;role_info_label&#x27;: &#x27;No access&#x27;, &#x27;role_info_summary&#x27;: &#x27;Used for restricting granted access&#x27;, &#x27;role_name&#x27;: &#x27;NoAccess&#x27;, &#x27;role_system&#x27;: True}, {&#x27;privileges&#x27;: [&#x27;System.Anonymous&#x27;, &#x27;System.View&#x27;], &#x27;role_id&#x27;: -3, &#x27;role_info_label&#x27;: &#x27;View&#x27;, &#x27;role_info_summary&#x27;: &#x27;Visibility access (cannot be granted)&#x27;, &#x27;role_name&#x27;: &#x27;View&#x27;, &#x27;role_system&#x27;: True}]</div>
+                        <div style="font-size: smaller; color: blue; word-wrap: break-word; word-break: break-all;">None</div>
                 </td>
             </tr>
     </table>
@@ -245,11 +359,7 @@ Status
 ------
 
 
-- This module will be removed in a release after 2021-12-01. *[deprecated]*
-- For more information see `DEPRECATED`_.
-
-
 Authors
 ~~~~~~~
 
-- Abhijeet Kasurde (@Akasurde)
+- Diane Wang (@Tomorrow9) <dianew@vmware.com>
